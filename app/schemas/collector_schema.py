@@ -17,6 +17,7 @@ class DescriptionLanguage(BaseModel):
 
 class CoinData(BaseModel):
     id: str
+    name: str
     market_data: CurrentPrices
     description: DescriptionLanguage
     symbol: str
