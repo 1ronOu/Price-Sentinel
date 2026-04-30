@@ -22,6 +22,7 @@ class Settings(BaseSettings):
             ))
     
     API_KEY: str
+    TELEGRAM_API: str
 
     REDIS_PASSWORD: str
     REDIS_HOST: str
