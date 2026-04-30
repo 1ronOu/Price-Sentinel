@@ -62,6 +62,26 @@ services:
       redis:
         condition: "service_healthy"
     restart: always
+  
+
+  telegram_bot:
+    build: .
+    container_name: telegram_bot
+    command: python -m app.bot_main
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    environment:
+      - HTTP_PROXY=http://host.docker.internal:7897
+      - HTTPS_PROXY=http://host.docker.internal:7897
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      db:
+        condition: "service_healthy"
+      redis:
+        condition: "service_healthy"
 
 
   app:
