@@ -3,6 +3,7 @@ from decimal import Decimal
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from starlette import status
 
 from app.schemas.item_schema import ItemCreate
 from app.cruds import coin_crud
@@ -50,9 +51,10 @@ async def get_history(db: AsyncSession):
 
 async def read_item(
         item_id: int,
+        user_id: int,
         db: AsyncSession
 ):
-    query = select(Item).where(Item.id == item_id)
+    query = select(Item).where(Item.id == item_id, Item.user_id == user_id)
     result = await db.execute(query)
     item = result.scalar_one_or_none()
     if not item:
@@ -64,23 +66,35 @@ async def read_item(
 
 
 async def read_items(
-        db: AsyncSession
+        db: AsyncSession,
+        user_id: int
 ):
-    result = await db.execute(select(Item))
+    result = await db.execute(select(Item).where(Item.user_id == user_id))
     return result.scalars().all()
 
 
 async def delete_item(
         db: AsyncSession,
-        item_id: int
+        item_id: int,
+        user_id: int
 ):
     item = await read_item(item_id=item_id, db=db)
+    if item.user_id != user_id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f'Access Denied'
+        )
     await db.delete(item)
     await db.commit()
 
 
-async def update_target_price(item_id: int, target_price: Decimal, db: AsyncSession):
-    item = await read_item(item_id=item_id, db=db)
+async def update_target_price(
+        item_id: int,
+        user_id: int,
+        target_price: Decimal,
+        db: AsyncSession
+):
+    item = await read_item(item_id=item_id, db=db, user=user_id)
     item.target_price = target_price
     item.is_notified = False
     await db.commit()
