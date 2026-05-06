@@ -6,12 +6,11 @@ from pydantic import BaseModel, ConfigDict, HttpUrl
 
 class UserBase(BaseModel): 
     name: str
-    password: str
     telegram_id: int | None = None
 
 
 class UserCreate(UserBase):
-    pass
+    password: str
 
 
 class UserOut(UserBase):
