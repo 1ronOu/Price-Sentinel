@@ -4,9 +4,11 @@ import logging
 from celery import shared_task
 from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import async_sessionmaker
-from app.cruds.item_crud import  update_item_current_price, read_items, get_multiple_items
+from app.cruds.item_crud import  update_item_current_price, get_multiple_items
 from sqlalchemy.ext.asyncio import create_async_engine
 from app.core.config import settings
+from app.models.item_models import Item, PriceHistory, Coin #!
+from app.models.user_models import User #!
 
 
 logger = logging.getLogger(__name__)

@@ -1,10 +1,7 @@
-from decimal import Decimal
-
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy import insert, select
 from sqlalchemy.orm import joinedload
 
-from app.models.user_models import User
 from app.schemas.coin_schema import CoinCreate
 from app.models.item_models import Coin, Item, PriceHistory
 from app.services.collector import get_crypto_by_id

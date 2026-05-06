@@ -6,6 +6,7 @@ from app.core.config import settings
 _bot: Bot = None
 _dp: Dispatcher = None
 
+
 def get_bot() -> Bot:
     global _bot
     if _bot is None:
@@ -14,6 +15,7 @@ def get_bot() -> Bot:
         session.connector = connector
         _bot = Bot(token=settings.TELEGRAM_API, session=session)
     return _bot
+
 
 def get_dispatcher() -> Dispatcher:
     global _dp
