@@ -20,8 +20,11 @@ async def process_name(message: types.Message, state: FSMContext, session: Async
     user = await user_crud.get_user_by_user_name(user_name=user_name, db=session)
     if user:
         if user.telegram_id == 0:
-            await user_crud.update_user(chat_id=chat_id, user=user, db=session)
-            await message.answer(text='Telegram and Price Sentinel connected successfully.')
+            is_upadted_successfully =await user_crud.update_user(chat_id=chat_id, user=user, db=session)
+            if is_upadted_successfully:
+                await message.answer(text='Telegram and Price Sentinel connected successfully.')
+            else:
+                await message.answer(text='You already have another account connected to Price Sentinel.')
         else:
             await message.answer(text='This user is already connected to Price Sentinel bot.')
         await state.clear()

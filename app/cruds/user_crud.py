@@ -1,9 +1,10 @@
-from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
+from sqlalchemy.exc import IntegrityError
 
 from app.schemas.user_schema import UserCreate, UserOut
 from app.models.user_models import User
+from app.services.hash_service import hash_password
 
 
 async def create_user(
@@ -11,6 +12,7 @@ async def create_user(
         db: AsyncSession
 ):
     user_data = user.model_dump()
+    user_data['password'] = await hash_password(user_data['password'])
     new_user = User(**user_data)
     db.add(new_user)
     await db.commit()
@@ -52,5 +54,11 @@ async def update_user(
         user: UserOut,
         db: AsyncSession
 ):
-    user.telegram_id = chat_id
-    await db.commit()
+    try:
+        user.telegram_id = chat_id
+        await db.flush()
+        await db.commit()
+        return True
+    except IntegrityError:
+        await db.rollback()
+        return False
