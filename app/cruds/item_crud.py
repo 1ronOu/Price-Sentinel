@@ -86,12 +86,7 @@ async def delete_item(
         item_id: int,
         user_id: int
 ):
-    item = await read_item(item_id=item_id, db=db)
-    if item.user_id != user_id:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail=f'Access Denied'
-        )
+    item = await read_item(item_id=item_id, db=db, user_id=user_id)
     await db.delete(item)
     await db.commit()
 
