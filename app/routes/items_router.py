@@ -19,7 +19,7 @@ router = APIRouter(
 @router.post('/create', response_model=ItemOut)
 async def create_item(
     coin: CoinCreate,
-    target_price: int,
+    target_price: Decimal,
     db: AsyncSession = Depends(get_db),
     user: User = Depends(get_current_user)
 ):

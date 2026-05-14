@@ -1,3 +1,4 @@
+from decimal import Decimal
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from sqlalchemy import insert, select
 from sqlalchemy.orm import joinedload
@@ -11,7 +12,7 @@ from app.cruds import item_crud
 
 async def create_coin(
         coin: CoinCreate,
-        target_price: int,
+        target_price: Decimal,
         user_id: int,
         db: AsyncSession
 ):
@@ -70,7 +71,7 @@ async def compare_prices(coin_prices: dict, db: AsyncSession):
 
     items_to_notify = []
     for item in items:
-        if item.target_price <= coin_prices.get(item.coin_id):
+        if item.target_price >= coin_prices.get(item.coin_id):
             items_to_notify.append(item)
 
     return items_to_notify
@@ -84,6 +85,7 @@ async def update_multiple_items(coin_api_ids: list, items: dict, db: AsyncSessio
     history = []
     coins_map = {coin.api_id: coin for coin in db_coins}
     coin_prices = {}
+
     for coin_id, currency_data in items.items():
         coin = coins_map.get(coin_id)
         new_price = next(iter(currency_data.values()))
@@ -98,11 +100,10 @@ async def update_multiple_items(coin_api_ids: list, items: dict, db: AsyncSessio
     if history:
         await db.execute(insert(PriceHistory), history)
 
-        
+
     await db.commit()
 
     items_to_notify = await compare_prices(coin_prices=coin_prices, db=db)
-
     await send_notifications(items=items_to_notify, db=db)
 
 
