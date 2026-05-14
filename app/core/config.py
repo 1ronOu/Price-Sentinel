@@ -10,9 +10,14 @@ BASE_DIR = Path(__file__).parent.parent.parent
 class Settings(BaseSettings):
     POSTGRES_USER: str
     POSTGRES_PASSWORD: str
-    POSTGRES_DB: str 
-    POSTGRES_HOST: str = 'db' 
+    POSTGRES_DB: str
+    POSTGRES_HOST: str = 'db'
     POSTGRES_PORT: int = 5432
+
+    TEST_POSTGRES_USER: str
+    TEST_POSTGRES_PASSWORD: str
+    TEST_POSTGRES_DB: str
+    TEST_POSTGRES_HOST: str
     
     @property
     def SQLALCHEMY_DATABASE_URI(self) -> str:
@@ -24,6 +29,17 @@ class Settings(BaseSettings):
             port=self.POSTGRES_PORT,
             path=self.POSTGRES_DB
             ))
+
+    @property
+    def SQLALCHEMY_TEST_DATABASE_URI(self) -> str:
+        return str(MultiHostUrl.build(
+            scheme='postgresql+asyncpg',
+            username=self.TEST_POSTGRES_USER,
+            password=self.TEST_POSTGRES_PASSWORD,
+            host=self.TEST_POSTGRES_HOST,
+            port=self.POSTGRES_PORT,
+            path=self.TEST_POSTGRES_DB
+        ))
     
     API_KEY: str
     TELEGRAM_API: str
