@@ -1,6 +1,9 @@
 from app.core.loader import get_bot
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.user_models import User
+
+
 async def send_notifications(items: list, db: AsyncSession):
     bot = get_bot()
     if items:
