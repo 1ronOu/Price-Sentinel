@@ -16,7 +16,7 @@ router = APIRouter(
     tags=['items']
 )
 
-@router.post('/create', response_model=ItemOut)
+@router.post('/', response_model=ItemOut)
 async def create_item(
     coin: CoinCreate,
     target_price: Decimal,
@@ -32,7 +32,7 @@ async def get_multiple_items(db: AsyncSession = Depends(get_db)):
     items = await item_crud.get_multiple_items(db=db)
     return items
 
-@router.get('/read_all', response_model=list[ItemOut])
+@router.get('/', response_model=list[ItemOut])
 async def read_all_items(
         user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
@@ -41,7 +41,7 @@ async def read_all_items(
     return await item_crud.read_items(db=db, user_id=user_id)
 
 
-@router.delete('/delete_item/{item_id}')
+@router.delete('/{item_id}')
 async def delete_item(
         item_id: int,
         user: User = Depends(get_current_user),
@@ -49,6 +49,7 @@ async def delete_item(
 ):
     user_id = user.id
     await item_crud.delete_item(item_id=item_id, db=db, user_id=user_id)
+
 
 @router.get('/all_history')
 async def get_all_history(db: AsyncSession = Depends(get_db)):
