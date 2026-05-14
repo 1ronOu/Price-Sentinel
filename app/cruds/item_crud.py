@@ -5,9 +5,9 @@ from sqlalchemy import select
 from sqlalchemy.ext.asyncio.session import AsyncSession
 from starlette import status
 
-from app.schemas.item_schema import ItemCreate
+from app.schemas.item_schema import ItemUpdate
 from app.cruds import coin_crud
-from app.models.item_models import Item, PriceHistory, Coin
+from app.models.item_models import Item, PriceHistory
 from app.services.collector import get_crypto_by_id, get_multiple_cryptos
 
 
@@ -99,11 +99,12 @@ async def delete_item(
 async def update_target_price(
         item_id: int,
         user_id: int,
-        target_price: Decimal,
+        item_to_update: ItemUpdate,
         db: AsyncSession
 ):
-    item = await read_item(item_id=item_id, db=db, user=user_id)
-    item.target_price = target_price
-    item.is_notified = False
+    item = await read_item(item_id=item_id, db=db, user_id=user_id)
+    if item_to_update.target_price:
+        item.target_price = item_to_update.target_price
+        item.is_notified = False
     await db.commit()
     return item

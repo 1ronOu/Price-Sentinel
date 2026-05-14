@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.auth.utils import get_current_user
 from app.core.database import get_db
 from app.models.user_models import User
-from app.schemas.item_schema import ItemOut
+from app.schemas.item_schema import ItemOut, ItemUpdate
 from app.schemas.coin_schema import CoinCreate
 from app.cruds import item_crud, coin_crud
 
@@ -55,17 +55,17 @@ async def get_all_history(db: AsyncSession = Depends(get_db)):
     return await item_crud.get_history(db=db)
 
 
-@router.put('/update_target_price')
+@router.put('/{item_id}', response_model=ItemOut)
 async def update_target_price(
         item_id: int,
-        target_price: Decimal,
+        item: ItemUpdate,
         user: User = Depends(get_current_user),
         db: AsyncSession = Depends(get_db)
 ):
     user_id = user.id
     updated_item = await item_crud.update_target_price(
         item_id=item_id,
-        target_price=target_price,
+        item_to_update=item,
         db=db,
         user_id=user_id
     )
