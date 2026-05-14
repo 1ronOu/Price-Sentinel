@@ -13,8 +13,8 @@ async def get_crypto_by_id(coin_id):
     try:
         async with httpx.AsyncClient(timeout=10.0) as client:
             response = await client.get(url, headers=headers)
-            if response.status_code != 200:
-                raise HTTPException(status_code=400, detail='Bad request')
+            if response.status_code == 404:
+                raise HTTPException(status_code=404, detail='Coin not found')
         json_data = response.json()
     except httpx.HTTPError:
         raise HTTPException(status_code=500, detail='Error with external api')
