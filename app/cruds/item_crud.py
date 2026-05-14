@@ -68,7 +68,7 @@ async def read_item(
     if not item:
         raise HTTPException(
             status_code=404,
-            detail=f'Item {item_id} not found'
+            detail=f'Item not found.'
         )
     return item
 
