@@ -24,4 +24,4 @@ class ItemOut(ItemBase):
 
 class ItemUpdate(BaseModel):
     target_price: Decimal | None = None
-    created_at: datetime
+
