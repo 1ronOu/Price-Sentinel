@@ -14,19 +14,27 @@ from app.services.collector import get_crypto_by_id, get_multiple_cryptos
 async def create_item(
         coin_id: int,
         user_id: int,
-        target_price: int,
+        target_price: Decimal,
         db: AsyncSession
 ):
-    new_item = Item(
-        user_id=user_id,
-        coin_id=coin_id,
-        target_price=target_price
-    )
-    db.add(new_item)
-    await db.commit()
-    await db.refresh(new_item)
-    return new_item
-
+    query = select(Item).where(Item.coin_id == coin_id, Item.user_id == user_id)
+    result = await db.execute(query)
+    item = result.scalars().all()
+    if not item:
+        new_item = Item(
+            user_id=user_id,
+            coin_id=coin_id,
+            target_price=target_price
+        )
+        db.add(new_item)
+        await db.commit()
+        await db.refresh(new_item)
+        return new_item
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_405_METHOD_NOT_ALLOWED,
+            detail='You already track this coin'
+        )
 
 async def update_item_current_price(
         item_id: int,
