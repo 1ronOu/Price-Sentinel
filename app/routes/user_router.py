@@ -18,7 +18,7 @@ router = APIRouter(
     tags=['user'],
 )
 
-@router.post('/create', response_model=UserOut)
+@router.post('/', response_model=UserOut)
 async def create_user(
     user: UserCreate,
     db: AsyncSession = Depends(get_db)
@@ -26,7 +26,7 @@ async def create_user(
     return await user_crud.create_user(user=user, db=db)
 
 
-@router.get('/me', response_model=UserOut)
+@router.get('/', response_model=UserOut)
 async def read_user(
         current_user: User = Depends(get_current_user)
 ):
