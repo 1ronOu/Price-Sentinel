@@ -1,33 +1,57 @@
+from typing import Dict
+
+import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.auth.utils import get_current_user_payload
-from app.models.item_models import Item, Coin
-from app.models.user_models import User
+
+@pytest.mark.parametrize(
+    'payload, expected_status_code',
+    [
+        ({'name': 'foo', 'password': 'bar'}, 200),
+        ({'name': 123, 'password': 'bar'}, 422),
+    ]
+)
+async def test_create_user(
+        client: AsyncClient,
+        db: AsyncSession,
+        payload: Dict[str, str],
+        expected_status_code: int,
+):
+    response = await client.post(url='/user/', json=payload)
+    if expected_status_code == 200:
+        data = response.json()
+        assert 'id' in data
+        assert data['name'] == payload['name']
+        assert 'password' not in data
+    assert response.status_code == expected_status_code
 
 
-def test_create_user():
-    assert True
+async def test_read_user(
+        client_user: AsyncClient,
+        db: AsyncSession,
+):
+    response = await client_user.get(url='/user/')
+
+    assert response.status_code == 200
+    assert response.json()['name'] == 'admin'
 
 
-async def test_get_all_users(db: AsyncSession, user: User):
-    assert user.id is not None
-    assert user.name is not None
+async def test_read_all_users(
+        client_user: AsyncClient,
+        db: AsyncSession,
+):
+    response = await client_user.get(url='/user/get_all')
+
+    assert response.status_code == 200
+    assert len(response.json()) > 0
 
 
-async def test_access_token(client_user:AsyncClient, db: AsyncSession):
-    access_token = (client_user.headers.get('Authorization')).split('Bearer ')[1]
-    assert access_token is not None
-    payload = await get_current_user_payload(token=access_token)
-    assert payload['sub'] is not None
+async def test_refresh(
+        client_user: AsyncClient,
+        db: AsyncSession,
+):
+    response = await client_user.post(url='/user/refresh')
 
-
-async def test_create_item(item: Item):
-    assert item.id is not None
-    assert item.user_id is not None
-    assert item.coin_id is not None
-
-
-async def test_create_coin(coin: Coin):
-    assert coin.id is not None
-    assert coin.price is not None
+    assert response.status_code == 200
+    assert 'access_token' in response.json()
