@@ -62,7 +62,6 @@ async def test_create_item_success(
         f'/item/?target_price={target_price}',
         json=payload
     )
-
     assert route.called
     assert response.status_code == expected_status_code
 
