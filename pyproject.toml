@@ -26,7 +26,8 @@ dependencies = [
     "python-multipart (>=0.0.27,<0.0.28)",
     "pytest (>=9.0.3,<10.0.0)",
     "factory-boy (>=3.3.3,<4.0.0)",
-    "respx (>=0.23.1,<0.24.0)"
+    "respx (>=0.23.1,<0.24.0)",
+    "pytest-cov (>=7.1.0,<8.0.0)"
 ]
 
 
