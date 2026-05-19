@@ -35,8 +35,8 @@ async def create_access_token(
 
 
 async def create_refresh_token(
-        response: Response,
         payload: dict,
+        response: Response | None = None,
         token_type: str = settings.REFRESH_TOKEN_TYPE,
         expires_delta: timedelta = timedelta(days=settings.REFRESH_TOKEN_EXPIRE_DAYS),
 ):
@@ -45,12 +45,13 @@ async def create_refresh_token(
         payload=payload,
         expires_delta=expires_delta,
     )
-    response.set_cookie(
-        key='refresh_token',
-        value=token,
-        httponly=True,
-        secure=True,
-        samesite='lax',
-        path='/user/refresh',
-    )
+    if response:
+        response.set_cookie(
+            key='refresh_token',
+            value=token,
+            httponly=True,
+            secure=True,
+            samesite='lax',
+            path='/user/refresh',
+        )
     return token
