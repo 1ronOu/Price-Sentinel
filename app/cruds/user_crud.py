@@ -12,7 +12,7 @@ async def create_user(
         db: AsyncSession
 ):
     user_data = user.model_dump()
-    user_data['password'] = await hash_password(user_data['password'])
+    user_data['password'] = hash_password(user_data['password'])
     new_user = User(**user_data)
     db.add(new_user)
     await db.commit()
